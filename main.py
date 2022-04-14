@@ -1,6 +1,6 @@
 import csv
 from pathlib import Path
-from Vacancy import Vacancy
+from vacancy import Vacancy
 from common import get_dict_from_request, get_city_id
 
 
