@@ -5,6 +5,7 @@ from common import get_dict_from_request, get_city_id
 
 
 def collect_request_parameters():
+    """ Request for search details from user """
     params = {}
     params["text"] = input("Enter vacancy search request (e.g. Role, Company name): ")
     experience = int(input("Specify your experience in years: "))
@@ -50,17 +51,20 @@ if __name__ == '__main__':
 
     params = collect_request_parameters()
     output_file_name = input("Set output file name: ") + '.csv'
-    print("Writing to file, please, wait.")
-    vacancies = []
 
+    print("Writing to file, please, wait.")
+
+    vacancies = []  # storage for all vacancies found
     vacancies_raw = get_dict_from_request("https://api.hh.ru/vacancies", params=params)
     available_pages = vacancies_raw["pages"]
 
+    # Collect information from the first page
     for item in vacancies_raw["items"]:
         vacancy = Vacancy(item["id"])
         vacancies.append(vacancy)
 
-    for page in range(1, min(5, available_pages)):  # goes through next pages, with limit of max 5 pages
+    # goes through next pages, with limit of max 5 pages
+    for page in range(1, min(5, available_pages)):
         params["page"] = page
         vacancies_raw = get_dict_from_request("https://api.hh.ru/vacancies", params=params)
 
@@ -68,6 +72,7 @@ if __name__ == '__main__':
             vacancy = Vacancy(item["id"])
             vacancies.append(vacancy)
 
+    # writes information into csv file
     with open(output_file_name, 'w', newline='', encoding='utf-8') as file:
         fieldnames = ["id", "name", "description", "link", "salary", "required_skills", "city", "required_experience"]
         writer = csv.writer(file)
